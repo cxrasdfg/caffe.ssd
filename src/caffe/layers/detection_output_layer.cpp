@@ -414,7 +414,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
             delete outfiles[label_name];
           }
         } else if (output_format_ == "COCO") {
-          boost::filesystem::path output_directory(output_directory_);
+          /*boost::filesystem::path output_directory(output_directory_);
           boost::filesystem::path file(output_name_prefix_ + ".json");
           boost::filesystem::path out_file = output_directory / file;
           std::ofstream outfile;
@@ -427,7 +427,7 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
           write_json(ss, output);
           std::string rv = boost::regex_replace(ss.str(), exp, "$1");
           outfile << rv.substr(rv.find("["), rv.rfind("]") - rv.find("["))
-              << std::endl << "]" << std::endl;
+              << std::endl << "]" << std::endl;*/
         } else if (output_format_ == "ILSVRC") {
           boost::filesystem::path output_directory(output_directory_);
           boost::filesystem::path file(output_name_prefix_ + ".txt");

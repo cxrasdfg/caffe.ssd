@@ -7,6 +7,9 @@ $(error $(CONFIG_FILE) not found. See $(CONFIG_FILE).example.)
 endif
 include $(CONFIG_FILE)
 
+CXXFLAGS += -std=c++11
+COMMON_FLAGS += -std=c++11
+
 BUILD_DIR_LINK := $(BUILD_DIR)
 ifeq ($(RELEASE_BUILD_DIR),)
 	RELEASE_BUILD_DIR := .$(BUILD_DIR)_release
@@ -178,7 +181,8 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES := cudart cublas curand
 endif
 
-LIBRARIES += glog gflags protobuf boost_system boost_filesystem boost_regex m hdf5_hl hdf5
+LIBRARIES += boost_system boost_filesystem
+LIBRARIES += glog gflags protobuf boost_system boost_filesystem boost_regex m hdf5_serial_hl hdf5_serial
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -262,7 +266,7 @@ ifeq ($(LINUX), 1)
 	endif
 	# boost::thread is reasonably called boost_thread (compare OS X)
 	# We will also explicitly add stdc++ to the link target.
-	LIBRARIES += boost_thread stdc++
+	LIBRARIES += boost_thread stdc++ boost_regex boost_system boost_filesystem
 	VERSIONFLAGS += -Wl,-soname,$(DYNAMIC_VERSIONED_NAME_SHORT) -Wl,-rpath,$(ORIGIN)/../lib
 endif
 
