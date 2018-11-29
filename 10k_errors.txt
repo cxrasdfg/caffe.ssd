@@ -1,7 +1,7 @@
 编译ssd.caffe遇到的一万个错误:
 1.glog gflags protobuf leveldb snappy  boost 全部手动编译安装。。
 注意protobuf checkout到3.1版本，3.6会有兼容问题。安装gflags与
-leveldb的时候注意选择为动态链接库
+leveldb,snappy的时候注意选择为动态链接库。boost请用1.58...
 2.Check failed: error == cudaSuccess (10 vs. 0)  invalid device ordinal:
 请把ssd_pascal.py文件中第332行gpus = "0，1，2，3"更改为实际机器跑的gpu
 索引。
