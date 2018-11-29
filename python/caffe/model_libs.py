@@ -794,7 +794,7 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
         use_scale=True, min_sizes=[], max_sizes=[], prior_variance = [0.1],
         aspect_ratios=[], steps=[], img_height=0, img_width=0, share_location=True,
         flip=True, clip=True, offset=0.5, inter_layer_depth=[], kernel_size=1, pad=0,
-        conf_postfix='', loc_postfix='', **bn_param):
+        conf_postfix='', loc_postfix='', high_order=False,**bn_param):
     assert num_classes, "must provide num_classes"
     assert num_classes > 0, "num_classes must be positive number"
     if normalizations:
@@ -876,6 +876,11 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
 
         # Create confidence prediction layer.
         name = "{}_mbox_conf{}".format(from_layer, conf_postfix)
+        if high_order:
+            high_order_layer_name='%s_high_order_%s' % (from_layer, conf_postfix)
+            add_order_layers(net,from_layer,high_order_layer_name,use_batchnorm,2,4096,lr_mult=lr_mult,**bn_param)     
+            from_layer=high_order_layer_name  
+
         num_conf_output = num_priors_per_location * num_classes;
         ConvBNLayer(net, from_layer, name, use_bn=use_batchnorm, use_relu=False, lr_mult=lr_mult,
             num_output=num_conf_output, kernel_size=kernel_size, pad=pad, stride=1, **bn_param)
@@ -931,3 +936,38 @@ def CreateMultiBoxHead(net, data_layer="data", num_classes=[], from_layers=[],
         mbox_layers.append(net[name])
 
     return mbox_layers
+
+
+def add_order_layers(net,from_layer,out_layer,use_bn,orders,num_output,lr_mult=1,**bn_params):
+    cat_list=[]
+    for r in range(orders):
+        if r==0:
+            cat_list.append(net[from_layer])
+        else:
+            mul_layers=[]
+            for s in range(0,r+1):
+                r_s_conv_name="%s_conv_r%d_s%d" %(from_layer,r,s)
+                # no return value
+                ConvBNLayer(net, from_layer,r_s_conv_name, use_bn=use_bn, use_relu=False, lr_mult=lr_mult,
+                      num_output=num_output, kernel_size=1, pad=0, stride=1, **bn_params)
+                mul_layers.append(net[r_s_conv_name])        
+            r_mul_layer_name="%s_elem_r%d"%(from_layer,r)
+            kwargs={
+                'eltwise_param':{
+                    'operation':P.Eltwise.PROD,
+                }
+            }
+            # print(len(mul_layers))
+            # exit(0)
+            net[r_mul_layer_name]=L.Eltwise(*mul_layers,**kwargs)
+            cat_list.append(net[r_mul_layer_name])
+    
+    kwargs={
+        'concat_param':{
+            'axis':1
+        }
+    }
+    
+    net[out_layer]=L.Concat(*cat_list,**kwargs)
+    # print(len(cat_list) )
+    # exit(0)
