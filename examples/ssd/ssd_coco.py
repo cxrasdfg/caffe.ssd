@@ -258,7 +258,8 @@ snapshot_prefix = "{}/{}".format(snapshot_dir, model_name)
 job_file = "{}/{}.sh".format(job_dir, model_name)
 
 # Stores the test image names and sizes. Created by data/coco/create_list.sh
-name_size_file = "data/coco/minival2014_name_size.txt"
+# name_size_file = "data/coco/minival2014_name_size.txt"
+name_size_file = "data/coco/val2017_name_size.txt"
 # The pretrained model. We use the Fully convolutional reduced (atrous) VGGNet.
 pretrain_model = "models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel"
 # Stores LabelMapItem.
@@ -331,7 +332,8 @@ clip = False
 
 # Solver parameters.
 # Defining which GPUs to use.
-gpus = "0,1,2,3"
+#gpus = "0,1,2,3"
+gpus = "0,1"
 gpulist = gpus.split(",")
 num_gpus = len(gpulist)
 

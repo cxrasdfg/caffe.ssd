@@ -48,7 +48,7 @@
 .idea
 
 # Visual Studio Code files
-#.vscode
+.vscode/*
 
 # OSX dir files
 .DS_Store
@@ -61,7 +61,11 @@
 # Data and models are either
 # 1. reference, and not casually committed
 # 2. custom, and live on their own unless they're deliberated contributed
+!/data
 data/*
+!data/coco
+data/coco/*
+!data/coco/cocoAPI
 models/*
 *.caffemodel
 *.caffemodel.h5
